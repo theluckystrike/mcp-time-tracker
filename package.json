@@ -1,0 +1,48 @@
+{
+  "name": "@theluckystrike/mcp-time-tracker",
+  "version": "0.15.0",
+  "description": "Track billable time without leaving your AI chat. Timers, entries, reports, CSV export and invoice line items, all stored locally.",
+  "type": "module",
+  "bin": {
+    "mcp-time-tracker": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "server.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"import('node:fs').then(f=>f.chmodSync('dist/index.js',0o755))\"",
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "time-tracking",
+    "timesheet",
+    "invoicing",
+    "freelance"
+  ],
+  "license": "MIT",
+  "author": "theluckystrike",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theluckystrike/mcp-servers",
+    "directory": "servers/time-tracker"
+  },
+  "homepage": "https://github.com/theluckystrike/mcp-servers/tree/main/servers/time-tracker",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@theluckystrike/mcp-license": "file:vendor/mcp-license",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  }
+}
