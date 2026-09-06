@@ -1,0 +1,19 @@
+{
+  "npm": {
+    "registryType": "npm",
+    "registryBaseUrl": "https://registry.npmjs.org",
+    "identifier": "@theluckystrike/mcp-time-tracker",
+    "version": "0.1.0",
+    "transport": {
+      "type": "stdio"
+    },
+    "environmentVariables": [
+      {
+        "name": "MCP_LICENSE_KEY",
+        "description": "Optional Pro license key (MCPL1....). Verified offline.",
+        "isRequired": false,
+        "isSecret": true
+      }
+    ]
+  }
+}
