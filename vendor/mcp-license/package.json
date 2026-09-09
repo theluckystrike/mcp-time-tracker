@@ -1,6 +1,6 @@
 {
   "name": "@theluckystrike/mcp-license",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Offline Ed25519 license verification and free/pro gating for MCP servers by theluckystrike",
   "type": "module",
   "main": "dist/index.js",

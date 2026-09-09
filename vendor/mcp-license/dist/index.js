@@ -16,7 +16,7 @@ export const PRICE_BUNDLE_USD = 39;
  * the number of sellable servers on disk, so adding a server fails the suite rather than
  * leaving "all 22 servers" stale in every cap message on every server.
  */
-export const SERVER_COUNT = 30;
+export const SERVER_COUNT = 31;
 /** The bundle checkout URL for a cap message, tagged `<product>.<tool>.bundle`. */
 export function bundleLink(src, tenant) {
     const params = [];
@@ -195,7 +195,11 @@ export function createLicenseGate(opts) {
             return {
                 product, tier: r.ok ? "pro" : "free", licenseId: r.payload?.id,
                 expires: r.payload ? (r.payload.exp ? new Date(r.payload.exp * 1000).toISOString() : null) : undefined,
-                source: r.source, reason: r.ok ? undefined : r.reason, upgradeUrl,
+                // Tagged so a genuine in-product upgrade click is attributable. Untagged it
+                // arrives as "<id>.unknown" and is indistinguishable from crawler noise; the
+                // conversion audit found 28 distinct .unknown sources for exactly this reason.
+                source: r.source, reason: r.ok ? undefined : r.reason,
+                upgradeUrl: `${upgradeUrl}?src=${encodeURIComponent(`product.${product}.status`)}`,
             };
         },
         activate(key) {
@@ -217,8 +221,8 @@ export function createLicenseGate(opts) {
                 bundleSentence(src);
         },
         registerTools(server) {
-            server.registerTool("license_status", { title: "License status", description: "Show whether this server runs in free or Pro mode and where to upgrade.", inputSchema: {} }, async () => ({ content: [{ type: "text", text: JSON.stringify(gate.status(), null, 2) }] }));
-            server.registerTool("license_activate", { title: "Activate license", description: "Activate a Pro license key (format MCPL1.xxx.yyy). Verified offline and saved locally.",
+            server.registerTool("license_status", { title: "License status", description: "Report this server's licence state: product, tier free or pro, licence id, expiry, the key source and the upgrade URL. No arguments, no network. Explains a free-tier refusal; license_activate installs a key.", inputSchema: {} }, async () => ({ content: [{ type: "text", text: JSON.stringify(gate.status(), null, 2) }] }));
+            server.registerTool("license_activate", { title: "Activate license", description: "Activate a Pro key (MCPL1.xxx.yyy) from checkout: verified offline against a built-in public key, saved to your config file. A wrong, malformed or expired key is refused, unsaved. license_status reads it back.",
                 inputSchema: { key: z.string().describe("License key from the checkout confirmation page") } }, async ({ key }) => {
                 const r = gate.activate(key);
                 return r.ok

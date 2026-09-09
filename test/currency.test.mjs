@@ -66,7 +66,7 @@ function client(env) {
 const today = localDay();
 const DAY = { from: `${today}T00:00:00`, to: `${today}T23:59:59` };
 
-test.skip("D-3: 2.5 hours at 90 euros an hour comes back as EUR 225.00, mixed currencies stay apart", async (t) => {
+test("D-3: 2.5 hours at 90 euros an hour comes back as EUR 225.00, mixed currencies stay apart", async (t) => {
   const c = client({});
   t.after(() => c.close());
   await c.init();

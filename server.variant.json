@@ -2,19 +2,18 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.theluckystrike/timer-tracking",
   "description": "Timer and time-tracking add-on: start/stop timers, log entries, CSV export. Data stays local.",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "repository": {
     "url": "https://github.com/theluckystrike/mcp-servers",
     "source": "github",
     "subfolder": "servers/time-tracker"
   },
-  "websiteUrl": "https://mcp.zovo.one/buy/time-tracker",
+  "websiteUrl": "https://mcp.zovo.one/s/time-tracker",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/theluckystrike/mcp-servers/releases/download/v0.20.0/time-tracker.mcpb",
-      "version": "0.20.0",
-      "fileSha256": "da623ffcff20ae964f800bef8e6086bb6dce3a33cb97746f174a03f4cfc9f655",
+      "identifier": "https://github.com/theluckystrike/mcp-servers/releases/download/v0.21.0/time-tracker.mcpb",
+      "version": "0.21.0",
       "transport": {
         "type": "stdio"
       },
@@ -25,7 +24,8 @@
           "isRequired": false,
           "isSecret": true
         }
-      ]
+      ],
+      "fileSha256": "fb897668c96c5f48fafc2e4eaa9b70695b72938ed0e1eb3361df2812de75a669"
     }
   ]
 }

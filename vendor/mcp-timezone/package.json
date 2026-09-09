@@ -1,6 +1,6 @@
 {
   "name": "@theluckystrike/mcp-timezone",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Time zones, meeting slots and calendar invites for people who work with clients abroad. Convert times, find hours that suit everyone, check DST, write .ics. All local.",
   "type": "module",
   "bin": {

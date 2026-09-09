@@ -1,6 +1,6 @@
 {
   "name": "@theluckystrike/mcp-time-tracker",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Track billable time without leaving your AI chat. Timers, entries, reports, CSV export and invoice line items, all stored locally.",
   "type": "module",
   "bin": {

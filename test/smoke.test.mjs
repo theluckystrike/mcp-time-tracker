@@ -79,7 +79,7 @@ function client(env) {
   };
 }
 
-test.skip("free tier: initialize, tools/list, timer, report, gating", async () => {
+test("free tier: initialize, tools/list, timer, report, gating", async () => {
   const c = client({});
   try {
     await c.init();

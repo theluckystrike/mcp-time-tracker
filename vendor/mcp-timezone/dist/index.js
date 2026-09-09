@@ -134,7 +134,7 @@ gate.registerTools(server);
 /* ------------------------------------------------------------------- now */
 server.registerTool("now", {
     title: "Current time in zones",
-    description: "The current time in one or more places. Accepts IANA zones (Europe/Warsaw), city names (Warsaw), country names (Poland) or abbreviations (PST, IST). With no zones it reports this machine's local zone and UTC.",
+    description: "The current time in one or more places, each with the zone it resolved to and the local date, time and offset, under one UTC instant. Accepts IANA zones, cities, countries and abbreviations.",
     inputSchema: {
         zones: z.array(text(MAX_ZONE_TEXT, "a zone")).max(MAX_ZONES).optional().describe("Places or IANA zones, e.g. ['Warsaw','New York','India']"),
     },
@@ -388,7 +388,7 @@ server.registerTool("dst_changes", {
 /* --------------------------------------------------------- business_days */
 server.registerTool("business_days", {
     title: "Count business days",
-    description: "Count the business days between two dates in a place, for delivery dates and payment terms. Returns the business-day count, the calendar total, and how many days fell on a weekend or on a holiday you passed.",
+    description: "Count business days between two dates in a place, inclusive, with the calendar total and the weekend and holiday counts. It has NO holiday calendar: without holidays, only weekends are excluded.",
     inputSchema: {
         from: text(MAX_ZONE_TEXT, "from").describe("Start date, YYYY-MM-DD (inclusive). A date that does not exist, such as 2026-02-30, is refused, never rolled forward"),
         to: text(MAX_ZONE_TEXT, "to").describe("End date, YYYY-MM-DD (inclusive)"),
@@ -411,7 +411,7 @@ server.registerTool("business_days", {
 /* -------------------------------------------------------------- contacts */
 server.registerTool("contacts_set", {
     title: "Save a contact's zone",
-    description: "Remember a client or teammate's time zone and working hours so you can say 'find a slot with Maria and Raj' later.",
+    description: "Save one person's zone and working hours so later calls can name them. Returns the resolved zone and their local time now. Saving the same name REPLACES that contact and says so. Free: 5 contacts.",
     inputSchema: {
         name: text(MAX_ZONE_TEXT, "name").min(1).describe("Their name"),
         zone: text(MAX_ZONE_TEXT, "zone").min(1).describe("Their place or IANA zone"),
@@ -442,7 +442,7 @@ server.registerTool("contacts_set", {
 }));
 server.registerTool("contacts_list", {
     title: "List saved contacts",
-    description: "Everyone you have saved, with their current local time and whether they are inside working hours right now.",
+    description: "List saved contacts with their zone, local time now, working hours and whether they are inside them; weekends count as outside. It also prints YOUR zone from the shared business profile.",
     inputSchema: {},
 }, guard(async () => {
     const db = load();
@@ -469,7 +469,7 @@ server.registerTool("contacts_list", {
 /* ------------------------------------------------------------- ics_create */
 server.registerTool("ics_create", {
     title: "Write a calendar invite",
-    description: "Call this tool to write a .ics calendar file for one meeting. Returns the path written and the meeting time in UTC and in the zone you gave.",
+    description: "Call this tool to write a .ics for one meeting and return the path plus the start in UTC and in your zone. Times are stored in UTC so it lands correctly in any client. Free: 3 files a month.",
     inputSchema: {
         title: text(MAX_TITLE, "title").min(1).describe("Event title"),
         start: text(MAX_ZONE_TEXT, "start").describe("Start time, read in `zone` unless it carries an offset"),

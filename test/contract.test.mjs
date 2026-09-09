@@ -167,7 +167,7 @@ test("corrupt store: the garbage is quarantined byte-for-byte and nothing is ove
   assert.equal(readdirSync(dir).includes("data.json"), false, "an empty store must not be written over the corrupt one");
 });
 
-test.skip("cap: no row-capped write tool on this server", { skip: "time-tracker has no row cap on a written file; its free limits are counts of stored records, covered by the server's own suites" }, () => {});
+test("cap: no row-capped write tool on this server", { skip: "time-tracker has no row cap on a written file; its free limits are counts of stored records, covered by the server's own suites" }, () => {});
 
 test.skip("license_status reports free with no key and pro with a signed key", async (t) => {
   const free = client();
