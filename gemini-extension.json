@@ -1,0 +1,22 @@
+{
+  "name": "mcp-time-tracker",
+  "version": "0.21.0",
+  "description": "MCP server for time tracking: timesheets, a timesheet and a billable hours tracker. Track billable time without leaving the chat.",
+  "settings": [
+    {
+      "name": "mcp.zovo.one token",
+      "description": "A free anonymous token from https://mcp.zovo.one/mcp/token, or your Pro key. One token is one data space, and it is refreshed for another 30 days on every write.",
+      "envVar": "ZOVO_MCP_TOKEN",
+      "sensitive": true
+    }
+  ],
+  "mcpServers": {
+    "time-tracker": {
+      "httpUrl": "https://mcp.zovo.one/mcp/time-tracker",
+      "headers": {
+        "Authorization": "Bearer ${ZOVO_MCP_TOKEN}"
+      },
+      "description": "Track billable time without leaving the chat."
+    }
+  }
+}
