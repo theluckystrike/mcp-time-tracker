@@ -2,7 +2,7 @@
 
 <!-- mirror-seo:start -->
 
-**MCP server for time tracking, a timesheet and billable hours tracker.** Track billable time without leaving the chat.
+**MCP server for time tracking: timesheets, a timesheet and a billable hours tracker.** Track billable time without leaving the chat.
 
 Works with Claude Desktop, Claude Code, Cursor and any Model Context Protocol client. Runs on your own machine, or hosted with no install.
 
