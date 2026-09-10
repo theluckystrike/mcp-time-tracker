@@ -1,13 +1,45 @@
 # mcp-time-tracker
 
+<!-- mirror-seo:start -->
+
+**MCP server for time tracking, a timesheet and billable hours tracker.** Track billable time without leaving the chat.
+
+Works with Claude Desktop, Claude Code, Cursor and any Model Context Protocol client. Runs on your own machine, or hosted with no install.
+
+## Install
+
+**Hosted, nothing to install.** Point an MCP client at `https://mcp.zovo.one/mcp/time-tracker` over streamable-http and send `Authorization: Bearer <token>`, where the token is a Pro key or a free anonymous one from <https://mcp.zovo.one/mcp/token>.
+
+**Claude Desktop, one click.** Download `time-tracker.mcpb` from the [latest release](https://github.com/theluckystrike/mcp-servers/releases/latest) and double-click it.
+
+**From source.** The mirror is self-contained: every `@theluckystrike/*` dependency is vendored, so a fresh clone builds with no extra setup.
+
+```sh
+git clone https://github.com/theluckystrike/mcp-time-tracker.git
+cd mcp-time-tracker
+npm install && npm run build
+```
+
+Then point your client at the built entry point:
+
+```json
+{
+  "mcpServers": {
+    "time-tracker": {
+      "command": "node",
+      "args": ["/absolute/path/to/mcp-time-tracker/dist/index.js"]
+    }
+  }
+}
+```
+
+> `@theluckystrike/mcp-time-tracker` is **not published on npm yet**, so an `npx -y @theluckystrike/mcp-time-tracker` command will fail. The three paths above are the working ones and each is exercised by CI.
+
 ![time-tracker demo](https://raw.githubusercontent.com/theluckystrike/mcp-servers/main/assets/demo-time-tracker.gif)
-
-**One-click install:** download `time-tracker.mcpb` from the [latest release](https://github.com/theluckystrike/mcp-servers/releases/latest) and double-click it in Claude Desktop.
-
-**Hosted endpoint (no install):** `https://mcp.zovo.one/mcp/time-tracker` (streamable-http; send `Authorization: Bearer <Pro key or anonymous token from https://mcp.zovo.one/mcp/token>`).
 
 Read-only mirror of [mcp-servers/servers/time-tracker](https://github.com/theluckystrike/mcp-servers/tree/main/servers/time-tracker). See [MIRROR.md](MIRROR.md).
 
+<!-- mirror-seo:end -->
 
 Track billable time without leaving your AI chat. Say "start a timer on the acme redesign", keep working, then
 ask for "my hours this week by project" or "invoice lines for acme in August". It keeps a running timer, lets you
