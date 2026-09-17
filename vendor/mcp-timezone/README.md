@@ -9,6 +9,8 @@ as plain JSON on your own machine.
 
 Built by [theluckystrike](https://github.com/theluckystrike).
 
+**In the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.theluckystrike%2Ftimezone-world-clock-meeting-slots-overlap-ics/versions/latest)** (`io.github.theluckystrike/timezone-world-clock-meeting-slots-overlap-ics`).
+
 ![timezone demo](../../assets/demo-timezone.gif)
 
 **Find a meeting time that works for everyone abroad, convert any time between cities, and write the invite -- zero setup, all local.**

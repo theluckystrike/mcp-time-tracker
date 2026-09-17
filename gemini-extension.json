@@ -1,6 +1,6 @@
 {
   "name": "mcp-time-tracker",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "MCP server for time tracking: timesheets, a timesheet and a billable hours tracker. Track billable time without leaving the chat.",
   "settings": [
     {

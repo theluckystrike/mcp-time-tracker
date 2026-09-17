@@ -321,18 +321,24 @@ function guard<A>(fn: (a: A) => Promise<{ content: { type: "text"; text: string 
 
 /* ------------------------------------------------------------- selection */
 
-interface Window { fromMs: number; toMs: number; clamped: boolean }
+interface Window { fromMs: number; toMs: number; clamped: boolean; unread: boolean }
 
 /**
  * Codex v3 #20: `from: "2026-09-01"` is local start of day, `to: "2026-09-30"` is local
  * END of that day (23:59:59.999), so a month reported by dates includes its last day.
+ *
+ * D-R68: on the free tier a requested window that lies entirely before the 7-day floor
+ * clamps to an empty range, and the answer used to read identically to an empty month
+ * ("No entries found" + "the free tier shows the last 7 days"). Those are different
+ * facts - one says nothing was logged, the other says nothing was read - so the window
+ * now carries `unread` and the callsites say which one happened.
  */
 function windowFor(from: string | undefined, to: string | undefined, pro: boolean): Window {
   const fromMs = from ? parseTime(from, "from").getTime() : -Infinity;
   const toMs = to ? (DATE_ONLY.test(String(to).trim()) ? endOfLocalDay(to) : parseTime(to, "to").getTime()) : Infinity;
-  if (pro) return { fromMs, toMs, clamped: false };
+  if (pro) return { fromMs, toMs, clamped: false, unread: false };
   const floor = localDayStart(FREE_WINDOW_DAYS - 1).getTime();
-  return { fromMs: Math.max(fromMs, floor), toMs, clamped: fromMs < floor };
+  return { fromMs: Math.max(fromMs, floor), toMs, clamped: fromMs < floor, unread: toMs < floor };
 }
 
 /**
@@ -383,6 +389,17 @@ function resolveFilter(db: DB, project: string | undefined): Filter {
 
 const FREE_WINDOW_NOTE =
   `\n\nNote: the free tier shows the last ${FREE_WINDOW_DAYS} days. ` + gate.upgradeText("full history");
+
+// D-R68: distinct from FREE_WINDOW_NOTE - the requested window never intersected the
+// readable one, so "no rows" here means the period was never opened, not that it is empty.
+const UNREAD_WINDOW_NOTE =
+  `\n\nNothing was read: every day in the window you asked for is older than the free tier's last ${FREE_WINDOW_DAYS} days, so the period was never opened. An empty answer here means unread, not empty. ` + gate.upgradeText("full history");
+
+function windowTail(w: Window, pro: boolean): string {
+  if (pro) return "";
+  if (w.unread) return UNREAD_WINDOW_NOTE;
+  return w.clamped ? FREE_WINDOW_NOTE : "";
+}
 
 /* ---------------------------------------------------------------- server */
 
@@ -481,7 +498,7 @@ server.registerTool("timer_status", {
   // yesterday contributes only the minutes after midnight.
   const todayStart = localDayStart(0).getTime();
   const tomorrowStart = localDayStart(-1).getTime();
-  const w: Window = { fromMs: todayStart, toMs: tomorrowStart - 1, clamped: false };
+  const w: Window = { fromMs: todayStart, toMs: tomorrowStart - 1, clamped: false, unread: false };
   const todayEntries = select(db, w);
   let todaySec = todayEntries.reduce((a, e) => a + e.seconds, 0);
   const lines: string[] = [];
@@ -566,13 +583,17 @@ server.registerTool("entry_list", {
   const limit = a.limit ?? 50;
   const rows = all.slice(-limit).reverse();
   if (rows.length === 0) {
+    // D-R68: when the requested window is entirely older than the free tier's readable
+    // window, the clamped select is empty BY CONSTRUCTION - say nothing was read rather
+    // than nothing was found, or an unread month and an empty month read identically.
+    if (!pro && w.unread) return ok(UNREAD_WINDOW_NOTE.replace(/^\n\n/, ""));
     // D-R85: an empty store reads to a model as "nothing exists here yet, ask before writing".
     // entry_add already creates the named project on the fly (see resolveProject), so a plain
     // "no entries found" bought a confirmation question for facts the caller had already given.
     const msg = db.entries.length === 0
       ? "No time entries logged yet. entry_add creates the project from its project argument automatically - no setup needed."
       : "No entries found for that filter.";
-    return ok(`${msg}${!pro && w.clamped ? FREE_WINDOW_NOTE : ""}`);
+    return ok(`${msg}${windowTail(w, pro)}`);
   }
   const totalSec = rows.reduce((s, e) => s + e.seconds, 0);
   const body = table(
@@ -584,7 +605,7 @@ server.registerTool("entry_list", {
     ]),
   );
   const tail = `\n\n${rows.length} entries, ${hours(totalSec)} h total.`;
-  return ok(body + tail + (!pro && w.clamped ? FREE_WINDOW_NOTE : ""));
+  return ok(body + tail + windowTail(w, pro));
 }));
 
 server.registerTool("entry_delete", {
@@ -818,7 +839,7 @@ server.registerTool("report", {
   const mixed = totalParts.length > 1
     ? "\nAmounts are grouped by currency: EUR is never added to USD, so read one total per currency."
     : "";
-  const note = (!pro && w.clamped ? FREE_WINDOW_NOTE : "") + billedNote;
+  const note = windowTail(w, pro) + billedNote;
 
   if (fmt === "json") {
     return ok(JSON.stringify({
@@ -913,7 +934,7 @@ server.registerTool("export_csv", {
   const tmp = `${target}.${process.pid}.tmp`;
   writeFileSync(tmp, lines.join("\n") + "\n");
   renameSync(tmp, target);
-  const note = !pro && w.clamped ? FREE_WINDOW_NOTE : "";
+  const note = windowTail(w, pro);
   return ok(`Wrote ${entries.length} entries to ${target}${note}`);
 }));
 
@@ -972,7 +993,7 @@ server.registerTool("entry_mark_billed", {
 
 server.registerTool("invoice_summary", {
   title: "Invoice summary",
-  description: "Turn tracked billable time into invoice line items for one project or client: hours, hourly rate, amount per task and the total, in the currency the work was logged in (EUR 225.00, not $225.00).",
+  description: "Turn tracked billable time into invoice lines for one project: hours, hourly rate, amount per task and the total, one line per rate so two rates never average. Hours already marked billed are left out. Free: last 7 days.",
   inputSchema: {
     project: z.string().min(1).describe("Project or client to invoice"),
     from: z.string().describe("ISO date/time start of the billing period. Free covers the last 7 days; Pro invoices any period from the full history."),
@@ -993,7 +1014,7 @@ server.registerTool("invoice_summary", {
   const hidden = billableAll.length - entries.length;
   const billedNote = hidden > 0 ? BILLED_NOTE(hidden) : "";
   if (entries.length === 0) {
-    return ok(`No billable time for "${r.project}" in that period.` + (!pro && w.clamped ? FREE_WINDOW_NOTE : "") + billedNote);
+    return ok(`No billable time for "${r.project}" in that period.` + windowTail(w, pro) + billedNote);
   }
   // D-R1: one line per (task, rate, currency). Grouping by task alone blends two
   // rates into an average - EUR 89.82 for work agreed at EUR 90.00 - which is a
@@ -1033,7 +1054,7 @@ server.registerTool("invoice_summary", {
     `entry_ids: ${JSON.stringify(entryIds)}\n` +
     `After the invoice exists, call entry_mark_billed {ids: <these entry_ids>, invoice_number: "<the new invoice number>"} ` +
     `so these hours are not billed a second time.` +
-    (!pro && w.clamped ? FREE_WINDOW_NOTE : "") + billedNote,
+    windowTail(w, pro) + billedNote,
   );
 }));
 
@@ -1042,7 +1063,7 @@ server.registerTool("invoice_summary", {
 /** Codex v3 #22/#23: the day gets the part of each entry that falls inside it. */
 function daySummary(db: DB, key: string): string {
   const [y, m, d] = key.split("-").map(Number);
-  const entries = select(db, { fromMs: new Date(y, m - 1, d).getTime(), toMs: new Date(y, m - 1, d + 1).getTime() - 1, clamped: false });
+  const entries = select(db, { fromMs: new Date(y, m - 1, d).getTime(), toMs: new Date(y, m - 1, d + 1).getTime() - 1, clamped: false, unread: false });
   const sec = entries.reduce((s, e) => s + e.seconds, 0);
   if (entries.length === 0) return `${key}: nothing tracked.`;
   const byProject = aggregate(db, entries, "project");

@@ -124,8 +124,27 @@ function monthKey(d = new Date()) {
 function outPathOf(p) {
     const abs = isAbsolute(p) ? p : pathResolve(process.cwd(), p);
     const dir = dirname(abs);
-    if (!existsSync(dir))
-        mkdirSync(dir, { recursive: true });
+    // mkdirSync(recursive) never returns on a pseudo-filesystem. Measured on Linux in a
+    // node:22-alpine container: mkdir("/proc/nope") answers ENOENT in 0 ms, Node reads that
+    // as a missing parent and retries forever, and the call had not returned after 25
+    // seconds. Any caller-supplied out_path under /proc, /sys or /dev hung the server
+    // permanently. The ancestors are walked here instead, under a hard bound, and each
+    // level is created non-recursively so a repeated ENOENT terminates on the first one.
+    if (!existsSync(dir)) {
+        const missing = [];
+        let cur = dir;
+        for (let i = 0; i < 64 && !existsSync(cur); i++) {
+            missing.push(cur);
+            const parent = dirname(cur);
+            if (parent === cur)
+                break;
+            cur = parent;
+        }
+        if (!existsSync(cur))
+            throw new Error(`cannot create ${dir}: no existing ancestor directory`);
+        for (const d of missing.reverse())
+            mkdirSync(d);
+    }
     return abs;
 }
 /* ---------------------------------------------------------------- server */
@@ -153,7 +172,7 @@ server.registerTool("now", {
 /* ---------------------------------------------------------- convert_time */
 server.registerTool("convert_time", {
     title: "Convert a time between zones",
-    description: "Convert a time from one place to others. The input time is read as wall-clock time in from_zone unless it carries an offset or a trailing Z. Accepts '2026-09-10 15:00', an ISO timestamp, or a phrase like '3pm tomorrow'.",
+    description: "Convert one time from from_zone into every zone in to_zones, marking any day change, plus the UTC instant. The time is wall-clock in from_zone unless it carries an offset or a trailing Z. '3pm tomorrow' works.",
     inputSchema: {
         time: text(MAX_ZONE_TEXT, "time").describe("'2026-09-10 15:00', '2026-09-10T15:00:00Z', '3pm tomorrow', 'now'"),
         from_zone: text(MAX_ZONE_TEXT, "from_zone").describe("Place the time is given in, e.g. 'Warsaw' or 'Europe/Warsaw'"),
