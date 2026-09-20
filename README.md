@@ -335,3 +335,5 @@ argument; when none is stored, documents show `[add: email]` and the tool says s
 letting anyone improvise an address.
 
 **Listed on the [AI Product Index](https://index.percall.dev/l/zovo-time-tracker.html)** — live remote endpoint at [mcp.zovo.one/s/time-tracker](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
+
+**Featured on [Awesome MCP Servers](mcpservers.org)** — [directory listing](https://mcpservers.org/servers/github-com-theluckystrike-mcp-servers-tree-main-servers-time-tracker) | [live hosted endpoint](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
