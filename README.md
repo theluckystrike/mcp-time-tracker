@@ -6,6 +6,8 @@
 
 Works with Claude Desktop, Claude Code, Cursor and any Model Context Protocol client. Runs on your own machine, or hosted with no install.
 
+Product page: <https://mcp.zovo.one/s/time-tracker> — what it does, the tools it exposes, and a live token endpoint.
+
 ## Install
 
 **Hosted, nothing to install.** Get a token from <https://mcp.zovo.one/mcp/connect> (the connect page) or <https://mcp.zovo.one/mcp/token> (the same token as JSON); a free anonymous one is issued on the spot and a Pro key works the same way. Then point an MCP client at `https://mcp.zovo.one/mcp/time-tracker` over streamable-http and send the token as `Authorization: Bearer <token>`.
