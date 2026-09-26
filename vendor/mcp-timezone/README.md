@@ -13,17 +13,17 @@ Built by [theluckystrike](https://github.com/theluckystrike).
 
 ![timezone demo](../../assets/demo-timezone.gif)
 
-**Find a meeting time that works for everyone abroad, convert any time between cities, and write the invite -- zero setup, all local.**
+Find a meeting time that works for everyone abroad, convert any time between cities, and write the invite, zero setup, all local.
 
 ## 60-second install
 
 npm publish for `@theluckystrike/mcp-timezone` is pending. Until then, the `.mcpb` one-click bundle or a
-clone+build is the working path -- both are verified below.
+clone+build is the working path, both are verified below.
 
-**One-click (.mcpb):** download `timezone.mcpb` from the latest release and double-click it in Claude Desktop:
+One-click (.mcpb): download `timezone.mcpb` from the latest release and double-click it in Claude Desktop:
 https://github.com/theluckystrike/mcp-servers/releases/latest
 
-**Claude Desktop** (`claude_desktop_config.json`):
+(`claude_desktop_config.json`):
 
 ```json
 {
@@ -36,13 +36,13 @@ https://github.com/theluckystrike/mcp-servers/releases/latest
 }
 ```
 
-**Claude Code:**
+Claude Code:
 
 ```sh
 claude mcp add timezone -- npx -y @theluckystrike/mcp-timezone
 ```
 
-**Cursor** (`.cursor/mcp.json`):
+(`.cursor/mcp.json`):
 
 ```json
 {
@@ -139,12 +139,12 @@ and sorts ascending. The worst, not the average, on purpose: a slot that is plea
 for the third must never outrank one that is 10:00 for everybody. A fairness of 0 would mean the meeting sits
 at midday for all of them; anything under about 2 is comfortable.
 
-A slot is only offered when the whole meeting -- start to end -- is inside every participant's working window,
+A slot is only offered when the whole meeting, start to end, is inside every participant's working window,
 on their own local calendar day. Weekends in the first participant's zone are skipped. No slot ever starts
-before `earliest_date` -- if you pass a time with it, slots earlier that day are not proposed.
+before `earliest_date`, if you pass a time with it, slots earlier that day are not proposed.
 
 When nothing fits, the server says so, shows the windows, and then lists the closest times that are
-**outside** somebody's hours, ranked by the total minutes outside, with each person's local time and the
+somebody's hours, ranked by the total minutes outside, with each person's local time and the
 working hours that would make each one fit. On the free tier a search longer than 5 days is shortened to
 5 days and the answer says so; it is never refused outright.
 
@@ -159,7 +159,7 @@ line on stderr rather than silently answering with the wrong zone.
   Australia -> Australia/Sydney, Canada -> America/Toronto, Brazil -> America/Sao_Paulo, Russia -> Europe/Moscow,
   Mexico -> America/Mexico_City, Indonesia -> Asia/Jakarta. Name a city when you need a different one.
 - IANA ids always work and always win: pass `America/Denver` and you get exactly that.
-- `UTC+2` style offsets resolve to the matching fixed zone (`Etc/GMT-2` -- the Etc signs are inverted by the
+- `UTC+2` style offsets resolve to the matching fixed zone (`Etc/GMT-2`, the Etc signs are inverted by the
   IANA database, not by this server).
 - **A fixed abbreviation is an offset, not a place.** `EST` is `Etc/GMT+5` (UTC-05:00) all year, `PST` is
   `Etc/GMT+8`, `CET` is `Etc/GMT-1`, `JST` is `Etc/GMT-9`. Mapping them to a DST-observing zone made `EST`
@@ -258,29 +258,24 @@ ICU database already inside Node.
 
 ## Pairs with
 
-- [mcp-time-tracker](../time-tracker/README.md) -- track the hours you spend on those clients and report them.
-- [mcp-invoice](../invoice/README.md) -- turn the tracked hours into a numbered PDF invoice for the client abroad.
-- [office-suite](../office-suite/README.md) -- several servers behind one install, one config entry.
+- [mcp-time-tracker](../time-tracker/README.md), track the hours you spend on those clients and report them.
+- [mcp-invoice](../invoice/README.md), turn the tracked hours into a numbered PDF invoice for the client abroad.
+- [office-suite](../office-suite/README.md), several servers behind one install, one config entry.
 
 ## FAQ
 
-**Does it handle daylight saving?**
 Yes, and it does not store any DST rules of its own. Every offset is read from the ICU data in your Node
 build, so Warsaw and New York being 5 hours apart (not 6) between 8 and 29 March 2026 falls out correctly.
 
-**Why is my best slot still awkward?**
 Because a real overlap can be two hours wide. The fairness score reports the worst person's distance from
 their midday so you can see the cost and decide who absorbs it.
 
-**Can I use half-hour zones?**
 Yes. India (+05:30), Nepal (+05:45), Adelaide (+09:30) and Chatham are handled like any other zone; the slot
 grid is 30 minutes, so a half-hour zone produces :00 and :30 local starts.
 
-**Does it read my calendar?**
 No. It knows only the working hours you give it. It writes `.ics` files; it never reads or connects to a
 calendar service.
 
-**Does it need an internet connection?**
 No. There are no network calls anywhere, including license activation.
 
 ## License
@@ -296,3 +291,9 @@ resume and contract letterheads. Set it once with `business_set` (invoice or doc
 repeat it anywhere else. An email address is only ever taken from that profile or from an explicit
 argument; when none is stored, documents show `[add: email]` and the tool says so rather than
 letting anyone improvise an address.
+
+## Use these docs as an MCP server
+
+Any MCP client (Claude, Cursor, Windsurf, VS Code) can read this repository's documentation directly via GitMCP — no install:
+
+- Docs MCP URL: https://gitmcp.io/theluckystrike/mcp-timezone

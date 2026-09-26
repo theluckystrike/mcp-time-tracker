@@ -17,7 +17,7 @@ export const PRICE_BUNDLE_USD = 39;
  * the number of sellable servers on disk, so adding a server fails the suite rather than
  * leaving "all 22 servers" stale in every cap message on every server.
  */
-export const SERVER_COUNT = 41;
+export const SERVER_COUNT = 46;
 /** The prose page a human reads when they want the free-versus-Pro context, not a form. */
 export const GUIDE_URL = "https://mcp.zovo.one/guides/mcp-server-free-vs-pro";
 /** The bundle checkout URL for a cap message, tagged `<product>.<tool>.bundle`. */

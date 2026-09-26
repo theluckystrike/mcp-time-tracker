@@ -1,4 +1,4 @@
-# mcp-time-tracker
+# Track time from Claude with a free, no-install server
 
 <!-- mirror-seo:start -->
 
@@ -45,6 +45,9 @@ Read-only mirror of [mcp-servers/servers/time-tracker](https://github.com/theluc
 
 <!-- mirror-seo:end -->
 
+**Featured on [Awesome MCP Servers](mcpservers.org)** — [directory listing](https://mcpservers.org/servers/github-com-theluckystrike-mcp-servers-tree-main-servers-time-tracker) | [live hosted endpoint](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
+
+
 Track billable time without leaving your AI chat. Say "start a timer on the acme redesign", keep working, then
 ask for "my hours this week by project" or "invoice lines for acme in August". It keeps a running timer, lets you
 log time you forgot to track, applies your hourly rate per project, and turns the result into a report, a CSV file
@@ -54,18 +57,20 @@ Built by [theluckystrike](https://github.com/theluckystrike).
 
 **In the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.theluckystrike%2Ftime-tracker-timesheet-billable-hours/versions/latest)** (`io.github.theluckystrike/time-tracker-timesheet-billable-hours`).
 
+**Listed on the [AI Product Index](https://index.percall.dev/l/zovo-time-tracker.html)** — live remote endpoint at [mcp.zovo.one/s/time-tracker](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
 
-**Track billable time from chat and turn it straight into a report or invoice line items -- zero setup, all local.**
+
+Track billable time from chat and turn it straight into a report or invoice line items, zero setup, all local.
 
 ## 60-second install
 
 npm publish for `@theluckystrike/mcp-time-tracker` is pending. Until then, the `.mcpb` one-click bundle or a clone+build
-is the working path -- both are verified below.
+is the working path, both are verified below.
 
-**One-click (.mcpb):** download `time-tracker.mcpb` from the latest release and double-click it in Claude Desktop:
+One-click (.mcpb): download `time-tracker.mcpb` from the latest release and double-click it in Claude Desktop:
 https://github.com/theluckystrike/mcp-servers/releases/latest
 
-**Claude Desktop** (`claude_desktop_config.json`):
+(`claude_desktop_config.json`):
 
 ```json
 {
@@ -78,13 +83,13 @@ https://github.com/theluckystrike/mcp-servers/releases/latest
 }
 ```
 
-**Claude Code:**
+Claude Code:
 
 ```sh
 claude mcp add time-tracker -- npx -y @theluckystrike/mcp-time-tracker
 ```
 
-**Cursor** (`.cursor/mcp.json`):
+(`.cursor/mcp.json`):
 
 ```json
 {
@@ -228,7 +233,7 @@ There is no database and no hidden second file.
 
 If `data.json` is ever unreadable or not valid JSON, the server does **not** treat that as "no data yet".
 It moves the file aside byte-for-byte as `data.json.corrupt-<timestamp>`, writes a `data.json.corrupt`
-marker and makes every tool -- reads included -- return `data file is corrupt; moved to ...; nothing was
+marker and makes every tool, reads included, return `data file is corrupt; moved to ...; nothing was
 written`. Restore a good `data.json` (the quarantined copy is right there) and delete the marker file to
 carry on. Nothing is overwritten in the meantime.
 
@@ -243,7 +248,7 @@ carry on. Nothing is overwritten in the meantime.
   the part inside the period, not all of it and not none of it.
 - **Entries are split at local midnight for day grouping.** Work from 23:30 to 01:30 is 0.5 h on the first
   day and 1.5 h on the next, including across a month boundary. `timer_status` counts only the part of an
-  entry -- or of the running timer -- that falls after midnight today.
+  entry, or of the running timer, that falls after midnight today.
 - **Rate strings are parsed, never guessed.** `"1,200 USD"` is 1200 (a comma followed by exactly three
   digits is thousands grouping), `"12,50 EUR"` is 12.50 (the unambiguous European decimal shape), and
   `"1.200,50"` is 1200.50. Anything that could mean either thing, such as `"1,2345"`, is refused with a
@@ -260,12 +265,12 @@ carry on. Nothing is overwritten in the meantime.
 ## Limits and honest caveats
 
 - Free `entry_list`, `report`, `export_csv` and `invoice_summary` only see the last 7 days. Timers and
-  entries themselves are unlimited and nothing is ever deleted -- the window just narrows what a free
+  entries themselves are unlimited and nothing is ever deleted, the window just narrows what a free
   call can read back.
 - Free tier supports hourly rates on 2 projects; a third rated project needs Pro.
 - Every `report` grouping is free, tag included: the tag total is a correctness fix, not a premium
-  feature. `group_by` itself is optional -- omit it for the plain total per currency.
-- Only one timer can run at a time. Starting a second one stops and logs the first -- there is no
+  feature. `group_by` itself is optional, omit it for the plain total per currency.
+- Only one timer can run at a time. Starting a second one stops and logs the first, there is no
   concurrent-timer mode.
 - There is no reminder or idle-detection: if you forget to stop a timer, it keeps running until you stop
   it or start another.
@@ -289,36 +294,31 @@ carry on. Nothing is overwritten in the meantime.
 
 All data stays local: entries live in `${XDG_DATA_HOME:-~/.local/share}/mcp-servers/time-tracker/data.json`.
 The server makes no network requests, has no telemetry, and needs no account. License keys are Ed25519
-signatures verified offline against a public key compiled into the package -- activation works with no
+signatures verified offline against a public key compiled into the package, activation works with no
 internet connection.
 
 ## Pairs with
 
-- [mcp-invoice](../invoice/README.md) -- turn `invoice_summary` output straight into a numbered PDF invoice.
-- [mcp-spreadsheet](../spreadsheet/README.md) -- export a CSV with `export_csv` and query or reshape it.
-- [mcp-price-tracker](../price-tracker/README.md) -- if you also buy things for the client, watch those prices.
-- [office-suite](../office-suite/README.md) -- every sibling server behind one install, one config entry.
+- [mcp-invoice](../invoice/README.md), turn `invoice_summary` output straight into a numbered PDF invoice.
+- [mcp-spreadsheet](../spreadsheet/README.md), export a CSV with `export_csv` and query or reshape it.
+- [mcp-price-tracker](../price-tracker/README.md), if you also buy things for the client, watch those prices.
+- [office-suite](../office-suite/README.md), every sibling server behind one install, one config entry.
 - Guide: [Track billable hours in Claude Code and Cursor](https://mcp.zovo.one/guides/track-time-in-claude-code)
 
 ## FAQ
 
-**Does this work in Cursor as well as Claude Code and Claude Desktop?**
 Yes. All three speak MCP over stdio with the same config shape; the tools and the data file are identical
 regardless of client.
 
-**What happens when the free 7-day window runs out on an old entry?**
 Nothing is deleted. The entry stays in `data.json` forever; it just will not appear in `entry_list`,
 `report`, `export_csv` or `invoice_summary` results until you activate Pro, which opens full history.
 
-**Can I bill different clients in different currencies?**
 Yes. Currency is set per project (or per entry, overriding the project default) and every total is grouped
-by currency -- a report never adds EUR and USD together.
+by currency, a report never adds EUR and USD together.
 
-**What happens if two entries have overlapping times?**
 The server does not block overlaps; it logs what you tell it. `entry_edit` lets you fix a mistake after
 the fact.
 
-**Does it need an internet connection?**
 No. There are no network calls anywhere in this server, including for license activation, which is
 verified with a local public key.
 
@@ -336,6 +336,18 @@ repeat it anywhere else. An email address is only ever taken from that profile o
 argument; when none is stored, documents show `[add: email]` and the tool says so rather than
 letting anyone improvise an address.
 
-**Listed on the [AI Product Index](https://index.percall.dev/l/zovo-time-tracker.html)** — live remote endpoint at [mcp.zovo.one/s/time-tracker](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
+## Frequently asked questions
 
-**Featured on [Awesome MCP Servers](mcpservers.org)** — [directory listing](https://mcpservers.org/servers/github-com-theluckystrike-mcp-servers-tree-main-servers-time-tracker) | [live hosted endpoint](https://mcp.zovo.one/s/time-tracker), free tier, no signup.
+### Is there a free MCP time tracking server?
+
+Yes. The time-tracker server at mcp.zovo.one is a free MCP time tracking server with no install: start and stop timers in chat, keep per-client totals, and produce weekly reports. Unlike SaaS trackers (WebWork, TrackingTime) it needs no account — paste the hosted URL and go.
+
+### How do I track time from Claude?
+
+Connect https://mcp.zovo.one/mcp/time-tracker (tokenized URL from mcp.zovo.one/mcp/connect) and say: 'Start a timer for the Acme project.' Stop it later the same way; weekly summaries are one ask away.
+
+## Use these docs as an MCP server
+
+Any MCP client (Claude, Cursor, Windsurf, VS Code) can read this repository's documentation directly via GitMCP — no install:
+
+- Docs MCP URL: https://gitmcp.io/theluckystrike/mcp-time-tracker

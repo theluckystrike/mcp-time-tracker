@@ -151,7 +151,7 @@ function outPathOf(p) {
 const server = new McpServer({ name: "mcp-timezone", version: VERSION }, { capabilities: { tools: {}, resources: {}, prompts: {} } });
 gate.registerTools(server);
 /* ------------------------------------------------------------------- now */
-server.registerTool("now", {
+server.registerTool("now", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Current time in zones",
     description: "The current time in one or more places, each with the zone it resolved to and the local date, time and offset, under one UTC instant. Accepts IANA zones, cities, countries and abbreviations.",
     inputSchema: {
@@ -170,7 +170,7 @@ server.registerTool("now", {
     return ok(withNotes(`Now (${at.toISOString()} UTC)\n${rows.join("\n")}`, notes));
 }));
 /* ---------------------------------------------------------- convert_time */
-server.registerTool("convert_time", {
+server.registerTool("convert_time", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Convert a time between zones",
     description: "Convert one time from from_zone into every zone in to_zones, marking any day change, plus the UTC instant. The time is wall-clock in from_zone unless it carries an offset or a trailing Z. '3pm tomorrow' works.",
     inputSchema: {
@@ -206,7 +206,7 @@ function windowsFor(zones, ws, we, notes) {
         throw new Error(`work_end (${we}) must be after work_start (${ws})`);
     return zones.map(z => ({ zone: zoneOf(z, notes), label: z, startMin, endMin }));
 }
-server.registerTool("overlap", {
+server.registerTool("overlap", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Daily working-hours overlap",
     description: "The window each day when every listed place is inside working hours. Computed on a real date, so a DST week that widens or narrows the overlap is reflected.",
     inputSchema: {
@@ -286,7 +286,7 @@ function toParticipants(list) {
     });
     return { parts, sources };
 }
-server.registerTool("find_meeting_slots", {
+server.registerTool("find_meeting_slots", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Find meeting slots",
     description: "Rank the times when every participant is inside their own working hours. Returns each slot as a UTC instant with the local time for every participant and a fairness score, best first.",
     inputSchema: {
@@ -382,7 +382,7 @@ server.registerTool("find_meeting_slots", {
         lines.join("\n") + zoneSources + extra + note + windowLine + weekNote);
 }));
 /* ----------------------------------------------------------- dst_changes */
-server.registerTool("dst_changes", {
+server.registerTool("dst_changes", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Daylight-saving changes",
     description: "The clock changes in a place for a year, with the exact UTC instant and the offset before and after. Use it to check whether a recurring call moves for one of you in March or October.",
     inputSchema: {
@@ -405,7 +405,7 @@ server.registerTool("dst_changes", {
     return ok(`${zone} -> ${z}, clock changes in ${y}:\n${rows.join("\n")}`);
 }));
 /* --------------------------------------------------------- business_days */
-server.registerTool("business_days", {
+server.registerTool("business_days", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Count business days",
     description: "Count business days between two dates in a place, inclusive, with the calendar total and the weekend and holiday counts. It has NO holiday calendar: without holidays, only weekends are excluded.",
     inputSchema: {
@@ -428,7 +428,7 @@ server.registerTool("business_days", {
         `(${r.weekendCount} weekend, ${r.holidayCount} holiday).${hol}${listed}`);
 }));
 /* -------------------------------------------------------------- contacts */
-server.registerTool("contacts_set", {
+server.registerTool("contacts_set", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Save a contact's zone",
     description: "Save one person's zone and working hours so later calls can name them. Returns the resolved zone and their local time now. Saving the same name REPLACES that contact and says so. Free: 5 contacts.",
     inputSchema: {
@@ -459,7 +459,7 @@ server.registerTool("contacts_set", {
         return ok(`Saved ${name.trim()}: ${z}, ${work_start}-${work_end} local. Local time there now: ${describe(new Date(), z)}.${replaced}`);
     });
 }));
-server.registerTool("contacts_list", {
+server.registerTool("contacts_list", { annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     title: "List saved contacts",
     description: "List saved contacts with their zone, local time now, working hours and whether they are inside them; weekends count as outside. It also prints YOUR zone from the shared business profile.",
     inputSchema: {},
@@ -486,7 +486,7 @@ server.registerTool("contacts_list", {
     return ok(`${cs.length} contact(s):\n${rows.join("\n")}\n${youLine}`);
 }));
 /* ------------------------------------------------------------- ics_create */
-server.registerTool("ics_create", {
+server.registerTool("ics_create", { annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     title: "Write a calendar invite",
     description: "Call this tool to write a .ics for one meeting and return the path plus the start in UTC and in your zone. Times are stored in UTC so it lands correctly in any client. Free: 3 files a month.",
     inputSchema: {
